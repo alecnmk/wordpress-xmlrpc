@@ -19,3 +19,7 @@ rdoc
 pkg
 
 ## PROJECT::SPECIFIC
+.bundle
+wordpress
+webrat.log
+Gemfile.lock
