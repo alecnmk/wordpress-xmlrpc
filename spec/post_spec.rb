@@ -11,5 +11,28 @@ describe Wordpress::Post do
       post.content.should == "This is a content"
     end
   end
+
+  describe "to_struct" do
+    it "should return struct hash reflecting all post params" do
+      post = Wordpress::Post.new(
+                                 :title => "Post title",
+                                 :content => "Post content",
+                                 :excerpt => "Post excerpt",
+                                 :publish_date => Date.parse("01.08.2010")
+                                 )
+      post.to_struct.should == {
+        :title => "Post title",
+        :description => "Post content",
+        :mt_excerpt => "Post excerpt",
+        :dateCreated => Date.parse("01.08.2010")
+      }
+    end
+    it "should return incomplete struct for params without params that are nil" do
+      post = Wordpress::Post.new(:title => "Post title")
+      post.to_struct.should == {
+        :title => "Post title"
+      }
+    end
+  end
 end
 

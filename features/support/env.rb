@@ -1,12 +1,10 @@
-require 'rubygems'
-require 'bundler'
-Bundler.setup
-
 require 'capybara/cucumber'
 require 'selenium/webdriver'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
 require 'wordpress-xmlrpc'
+
+require 'mysql'
 
 Capybara.default_driver = :selenium
 Capybara.app_host = "http://localhost"
