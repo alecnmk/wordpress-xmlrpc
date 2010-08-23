@@ -21,10 +21,10 @@ module Wordpress
       begin
         post.id = client.call("metaWeblog.newPost", @id, @user, @password, post.to_struct, true).to_i
       rescue XMLRPC::FaultException
-        log.error "Error while publishing blog (#{$!})"
+        log.error {"Error while publishing blog (#{$!})"}
         return false
       end
-      log.info "Post published successfully"
+      log.info {"Post published successfully"}
       return true
     end #publish
   end
