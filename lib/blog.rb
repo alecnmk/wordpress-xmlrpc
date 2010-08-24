@@ -20,29 +20,37 @@ module Wordpress
       @client = XMLRPC::Client.new2(URI.join(@blog_uri.to_s, @xmlrpc_path).to_s)
     end #initialize
 
-    def recent_posts(numberOfPosts)
-      call_client("metaWeblog.getRecentPosts", numberOfPosts).collect do |struct|
+    def get_post(post_id)
+      Post.new(api_call("metaWeblog.getPost", post_id, @user, @password))
+    end #get_post
+
+    def recent_posts(number_of_posts)
+      blog_api_call("metaWeblog.getRecentPosts", number_of_posts).collect do |struct|
         Post.from_struct(struct)
       end
     end #recent_posts
 
     def publish(post)
-      begin
-        post.id = call_client("metaWeblog.newPost", post.to_struct, true).to_i
-        post.published = true
-        return true
-      rescue
-        return false
-      end
+      post.id = blog_api_call("metaWeblog.newPost", post.to_struct, true).to_i
+      post.published = true
     end #publish
 
     private
-    def call_client(method_name, *args)
+    def api_call(method_name, *args)
       begin
-        @client.call(method_name, @id, @user, @password, *args)
+        return @client.call(method_name, *args)
       rescue XMLRPC::FaultException
         log.log_exception "Error while calling #{method_name}", $!
-        raise APICallException, message
+        raise APICallException, "Error while calling #{method_name}"
+      end
+    end #api_call
+
+    def blog_api_call(method_name, *args)
+      begin
+        return @client.call(method_name, @id, @user, @password, *args)
+      rescue XMLRPC::FaultException
+        log.log_exception "Error while calling #{method_name}", $!
+        raise APICallException, "Error while calling #{method_name}"
       end
     end #call_client
   end

@@ -43,56 +43,63 @@ describe Wordpress::Blog do
     end
   end
 
-  describe "publish" do
-    it "should make appropriate call to xmlrpc api" do
-      client_mock = mock("client")
-      XMLRPC::Client.should_receive(:new2).with("http://localhost/xmlrpc").and_return(client_mock)
+  describe "api calls" do
+    before(:each) do
+      @client_mock = mock("client")
+      XMLRPC::Client.should_receive(:new2).with("http://localhost/xmlrpc").and_return(@client_mock)
 
-      blog = Wordpress::Blog.new(
-                                 :blog_uri => "http://localhost",
-                                 :user => "admin",
-                                 :password => "wordpress-xmlrpc",
-                                 :blog_id => 99
-                                 )
-      post = Wordpress::Post.new(
-                                 :title => "Hey ho",
-                                 :content => "Content",
-                                 :excerpt => "Excerpt",
-                                 :publish_date => Date.parse("01.08.2010"))
-
-      client_mock.should_receive(:call).with("metaWeblog.newPost", 99, "admin", "wordpress-xmlrpc", post.to_struct, true).and_return("123")
-
-      blog.publish(post).should be_true
-      post.id.should == 123
-      post.published.should be_true
+      @blog = Wordpress::Blog.new(
+                                   :blog_uri => "http://localhost",
+                                   :user => "admin",
+                                   :password => "wordpress-xmlrpc",
+                                   :blog_id => 0
+                                   )
     end
-  end
 
-  describe "recent_posts" do
-    it "should make appropriate call to xmlrpc api and return list of posts" do
-      client_mock = mock("client")
-      XMLRPC::Client.should_receive(:new2).with("http://localhost/xmlrpc").and_return(client_mock)
+    describe "publish" do
+      it "should make appropriate call to xmlrpc api" do
 
-      blog = Wordpress::Blog.new(
-                      :blog_uri => "http://localhost",
-                      :user => "admin",
-                      :password => "wordpress-xmlrpc",
-                      :blog_id => 0
-                      )
+        post = Wordpress::Post.new(
+                                   :title => "Hey ho",
+                                   :content => "Content",
+                                   :excerpt => "Excerpt",
+                                   :publish_date => Date.parse("01.08.2010"))
 
-      post_structs = (1..10).collect do |index|
-        {
-          :title => "Post #{index}"
-        }
+        @client_mock.should_receive(:call).with("metaWeblog.newPost", 0, "admin", "wordpress-xmlrpc", post.to_struct, true).and_return("123")
+
+        @blog.publish(post).should be_true
+        post.id.should == 123
+        post.published.should be_true
       end
+    end
 
-      client_mock.should_receive(:call).with("metaWeblog.getRecentPosts", 0, "admin", "wordpress-xmlrpc", 10).and_return(post_structs)
+    describe "recent_posts" do
+      it "should make appropriate call to xmlrpc api and return list of posts" do
+        post_structs = (1..10).collect do |index|
+          {
+            :title => "Post #{index}"
+          }
+        end
 
-      recent_posts = blog.recent_posts(10)
-      recent_posts.size.should == 10
-      recent_posts[0].title.should == "Post 1"
+        @client_mock.should_receive(:call).with("metaWeblog.getRecentPosts", 0, "admin", "wordpress-xmlrpc", 10).and_return(post_structs)
+
+        recent_posts = @blog.recent_posts(10)
+        recent_posts.size.should == 10
+        recent_posts[0].title.should == "Post 1"
+      end
+    end
+
+    describe "get_post" do
+      it "should return post for provided post_id" do
+        post_struct = {
+          :title => "Post title"
+        }
+        @client_mock.should_receive(:call).with("metaWeblog.getPost", 54, "admin", "wordpress-xmlrpc").and_return(post_struct)
+        post = @blog.get_post(54)
+        post.should_not be_nil
+        post.title.should == "Post title"
+      end
     end
   end
-
 end
 
