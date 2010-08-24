@@ -35,6 +35,10 @@ module Wordpress
       post.published = true
     end #publish
 
+    def update_post(post)
+      return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
+    end #update_post
+
     private
     def api_call(method_name, *args)
       begin

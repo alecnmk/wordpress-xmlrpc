@@ -100,6 +100,14 @@ describe Wordpress::Blog do
         post.title.should == "Post title"
       end
     end
+
+    describe "update_post" do
+      it "should submit post update" do
+        post = Wordpress::Post.new(:id => 54, :title => "Updated post", :published => true)
+        @client_mock.should_receive(:call).with("metaWeblog.editPost", 54, "admin", "wordpress-xmlrpc", post.to_struct, true).and_return(true)
+        @blog.update_post(post).should be_true
+      end
+    end
   end
 end
 
