@@ -6,7 +6,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
 require 'bundler/setup'
 require 'log4r'
-Log4r::Logger.root.level = Log4r::FATAL
+# Log4r::Logger.root.level = Log4r::FATAL
 
 require 'spec'
 require 'spec/autorun'

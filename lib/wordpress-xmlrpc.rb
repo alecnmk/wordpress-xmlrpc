@@ -5,6 +5,7 @@ require 'bundler/setup'
 
 require 'loggable'
 
+require 'exceptions'
 require 'blog'
 require 'post'
 
