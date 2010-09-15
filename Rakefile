@@ -3,6 +3,7 @@ require 'rake'
 
 begin
   require 'jeweler'
+
   Jeweler::Tasks.new do |gem|
     gem.name = "wordpress-xmlrpc"
     gem.summary = %Q{This gem is supposed to simplify wordpress xmlrpc interaction}
