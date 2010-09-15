@@ -36,7 +36,8 @@ Gem::Specification.new do |s|
      "spec/blog_spec.rb",
      "spec/post_spec.rb",
      "spec/spec.opts",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "wordpress-xmlrpc.gemspec"
   ]
   s.homepage = %q{http://github.com/alecnmk/wordpress-xmlrpc}
   s.rdoc_options = ["--charset=UTF-8"]
