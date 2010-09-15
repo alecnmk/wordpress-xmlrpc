@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "wordpress-xmlrpc"
     gem.summary = %Q{This gem is supposed to simplify wordpress xmlrpc interaction}
-    gem.description = %Q{Please do not fork it before directly contacing me. This gem is under hardly development.}
+    gem.description = %Q{Please do not fork it before directly contacint}
     gem.email = "alecnmk@gmail.com"
     gem.homepage = "http://github.com/alecnmk/wordpress-xmlrpc"
     gem.authors = ["Alexander Naumenko"]
