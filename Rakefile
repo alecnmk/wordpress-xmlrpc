@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "wordpress-xmlrpc"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{This gem is supposed to simplify wordpress xmlrpc interaction}
+    gem.description = %Q{Please do not fork it before directly contacing me. This gem is under hardly development.}
     gem.email = "alecnmk@gmail.com"
     gem.homepage = "http://github.com/alecnmk/wordpress-xmlrpc"
     gem.authors = ["Alexander Naumenko"]
