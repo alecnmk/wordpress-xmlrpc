@@ -1,6 +1,6 @@
 = wordpress-xmlrpc
 
-This gem is very fresh and under hard development. Please contact me directly before forking it ;)
+This gem is very fresh and under hard development. Please contact me directly before forking it J
 
 == Note on Patches/Pull Requests
 
