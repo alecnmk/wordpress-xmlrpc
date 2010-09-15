@@ -7,10 +7,10 @@ Gem::Specification.new do |s|
   s.name = %q{wordpress-xmlrpc}
   s.version = ""
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=q
-  s.authors = ["Alexander yNaumenko"]
-  s.date = %q{2010-09-15}y
-  s.description = %q{Gem is under hard developement. Contact me directly before forking it}
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.authors = ["Alexander Naumenko"]
+  s.date = %q{2010-09-15}
+  s.description = %q{TODO: longer description of your gem}
   s.email = %q{alecnmk@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
