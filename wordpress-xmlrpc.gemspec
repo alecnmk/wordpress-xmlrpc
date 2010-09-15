@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{wordpress-xmlrpc}
-  s.version = ""
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Naumenko"]
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
      "LICENSE",
      "README.rdoc",
      "Rakefile",
+     "VERSION",
      "features/publish.feature",
      "features/step_definitions/basic_steps.rb",
      "features/step_definitions/mysql_steps.rb",
