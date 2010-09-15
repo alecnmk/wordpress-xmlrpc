@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Naumenko"]
   s.date = %q{2010-09-15}
-  s.description = %q{TODO: longer description of your gem}
+  s.description = %q{Please do not fork it before directly contacing me. This gem is under hardly development.}
   s.email = %q{alecnmk@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{TODO: one-line summary of your gem}
+  s.summary = %q{This gem is supposed to simplify wordpress xmlrpc interaction}
   s.test_files = [
     "spec/spec_helper.rb",
      "spec/blog_spec.rb",
