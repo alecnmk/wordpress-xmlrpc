@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Naumenko"]
   s.date = %q{2010-09-15}
-  s.description = %q{Please do not fork it before directly contacing me. This gem is under hardly development.}
+  s.description = %q{Please do not fork it before directly contacint}
   s.email = %q{alecnmk@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
