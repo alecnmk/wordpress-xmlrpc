@@ -16,7 +16,7 @@ Then /^I should see "([^\"]*)"$/ do |expected_content|
 end
 
 Given /^I have a blog control$/ do
-  @blog = Wordpress::Blog.new(:blog_uri => "http://localhost", :user => "admin", :password => "wordpress-xmlrpc")
+  @blog = Wordpress::Blog.new(:blog_uri => "http://testblog.artaxo-test-systems.de", :user => "admin", :password => "wordpress-xmlrpc")
 end
 
 When /^make following post:$/ do |table|
