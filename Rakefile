@@ -13,6 +13,8 @@ begin
     gem.authors = ["Alexander Naumenko"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_dependency 'log4r', '>=1.1.8'
+    gem.add_dependency 'mimemagic', '>=0.1.5'
+    gem.add_dependency 'nokogiri', '>=1.4.3.1'
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
