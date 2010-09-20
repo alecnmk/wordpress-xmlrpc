@@ -46,7 +46,7 @@ describe Wordpress::Blog do
   describe "api calls" do
     before(:each) do
       @client_mock = mock("client")
-      XMLRPC::Client.should_receive(:new2).with("http://localhost/xmlrpc").and_return(@client_mock)
+      XMLRPC::Client.should_receive(:new2).with("http://localhost/xmlrpc.php").and_return(@client_mock)
 
       @blog = Wordpress::Blog.new(
                                    :blog_uri => "http://localhost",
@@ -54,6 +54,15 @@ describe Wordpress::Blog do
                                    :password => "wordpress-xmlrpc",
                                    :blog_id => 0
                                    )
+    end
+
+    describe "delete_post" do
+      it "should make appropriate call to xmlrpc api" do
+        @client_mock.should_receive(:call).with("blogger.deletePost", "", 123, "admin", "wordpress-xmlrpc", true).and_return(true)
+
+        post = Wordpress::Post.new(:id => 123)
+        @blog.delete(post).should be_true
+      end
     end
 
     describe "publish" do
