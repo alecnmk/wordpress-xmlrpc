@@ -61,7 +61,7 @@ describe Wordpress::Blog do
         images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
         post = Wordpress::Post.new(
                                    :title => "Hey ho",
-                                   :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",
+                                   :content => "Content <img src=\"http://otherhost/post_picture.jpg?1231231123\">",
                                    :excerpt => "Excerpt",
                                    :images => images,
                                    :publish_date => Date.parse("01.08.2010"))

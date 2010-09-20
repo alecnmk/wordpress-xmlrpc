@@ -60,14 +60,11 @@ module Wordpress
 
         raise ArgumentError, "Image not found (path: #{image[:file_path]})" unless File.exist?(image[:file_path])
 
-        image_file = File.open(image[:file_path], "rb")
-        file_name = File.basename(image_file.path)
-
+        basename = File.basename(image[:file_path])
         uploaded_image = upload_file(File.open(image[:file_path], "rb"))
         raise "Image upload failed" if uploaded_image.nil?
-
-        doc.xpath("img[contains(@src, '#{file_name}')]").each do |img|
-          img['src'] = uploaded_image['url']
+        doc.css("img").each do |img|
+          img['src'] = uploaded_image['url'] if img['src'].include?(basename)
         end
       end
       post.content = doc.to_html
