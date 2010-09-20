@@ -11,7 +11,7 @@ module Wordpress
     def initialize(params = {})
       @blog_uri = URI.parse(check_param(params, :blog_uri))
 
-      @xmlrpc_path = params[:xmlrpc_path] || "xmlrpc"
+      @xmlrpc_path = params[:xmlrpc_path] || "xmlrpc.php"
 
       @id = params[:blog_id] || 0
 
