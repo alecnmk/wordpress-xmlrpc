@@ -6,12 +6,13 @@ Feature: Publish post
   Given I have a blog control
   And all posts and comments cleaned out
 
+  @wip
   Scenario: Load wordpress home page
     When I go to wordpress "home" page
     Then I should see "wordpress"
     When make following post:
-    | title  | content               | publish_date |
-    | hey ho | this is my first post |   01.08.2010 |
+    | title  | content               | creation_date |
+    | hey ho | this is my first post |    01.08.2010 |
     And I go to wordpress "home" page
     Then I should see "hey ho"
     And I should see "this is my first post"

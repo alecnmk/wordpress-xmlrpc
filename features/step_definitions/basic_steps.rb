@@ -16,12 +16,12 @@ Then /^I should see "([^\"]*)"$/ do |expected_content|
 end
 
 Given /^I have a blog control$/ do
-  @blog = Wordpress::Blog.new(:host => "http://localhost", :user => "admin", :password => "wordpress-xmlrpc")
+  @blog = Wordpress::Blog.new(:blog_uri => "http://localhost", :user => "admin", :password => "wordpress-xmlrpc")
 end
 
 When /^make following post:$/ do |table|
   table.hashes.each do |hash|
-    hash['publish_date'] = Date.parse(hash.delete('publish_date')) if hash['publish_date']
+    hash['creation_date'] = Date.parse(hash.delete('creation_date')) if hash['creation_date']
     post = Wordpress::Post.new(hash)
     @blog.publish(post)
   end

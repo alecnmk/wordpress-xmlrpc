@@ -1,5 +1,8 @@
 require 'xmlrpc/client'
 require 'params_check'
+require 'base64'
+require 'mimemagic'
+require 'nokogiri'
 
 module Wordpress
   class Blog
@@ -31,6 +34,19 @@ module Wordpress
     end #recent_posts
 
     def publish(post)
+      doc = Nokogiri::HTML::DocumentFragment.parse(post.content)
+      post.images.each do |image|
+        image_file = File.open(image[:file_path], "rb")
+        file_name = File.basename(image_file.path)
+
+        uploaded_image = upload_file(File.open(image[:file_path], "rb"))
+
+        doc.xpath("img[contains(@src, '#{file_name}')]").each do |img|
+          img['src'] = uploaded_image[:url]
+        end
+      end
+      post.content = doc.to_html
+
       post.id = blog_api_call("metaWeblog.newPost", post.to_struct, true).to_i
       post.published = true
     end #publish
@@ -38,6 +54,16 @@ module Wordpress
     def update_post(post)
       return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
     end #update_post
+
+    def upload_file(file)
+      struct = {
+        :name => File.basename(file.path),
+        :type => MimeMagic.by_magic(file).type,
+        :bits => Base64.encode64(file.read),
+        :overwrite => true
+      }
+      return blog_api_call("wp.uploadFile", struct)
+    end
 
     private
     def api_call(method_name, *args)

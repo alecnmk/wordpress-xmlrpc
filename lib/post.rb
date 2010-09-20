@@ -14,7 +14,8 @@ module Wordpress
                   :content,
                   :excerpt,
                   :creation_date,
-                  :published
+                  :published,
+                  :images
                   )
 
     def initialize(attributes = {})

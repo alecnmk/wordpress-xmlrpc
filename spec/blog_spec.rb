@@ -58,14 +58,44 @@ describe Wordpress::Blog do
 
     describe "publish" do
       it "should make appropriate call to xmlrpc api" do
-
+        images = [
+                  {
+                    :file_path => File.expand_path("./spec/support/files/post_picture.jpg")
+                  }
+                 ]
         post = Wordpress::Post.new(
                                    :title => "Hey ho",
-                                   :content => "Content",
+                                   :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",
                                    :excerpt => "Excerpt",
+                                   :images => images,
                                    :publish_date => Date.parse("01.08.2010"))
 
-        @client_mock.should_receive(:call).with("metaWeblog.newPost", 0, "admin", "wordpress-xmlrpc", post.to_struct, true).and_return("123")
+
+        required_post_struct = {
+          :title=>"Hey ho",
+          :description=>"Content <img src=\"http://localhost/post_picture.jpg\">",
+          :mt_excerpt=>"Excerpt"
+        }
+        @client_mock.should_receive(:call).with(
+                                                "metaWeblog.newPost",
+                                                0, "admin", "wordpress-xmlrpc",
+                                                required_post_struct, true).and_return("123")
+
+        @client_mock.should_receive(:call).with(
+                                                "wp.uploadFile",
+                                                0, "admin", "wordpress-xmlrpc",
+                                                {
+                                                  :type => "image/jpeg",
+                                                  :bits => "encoded file content",
+                                                  :overwrite => true,
+                                                  :name => "post_picture.jpg"
+                                                }).and_return({
+                                                               :file => "post_picture.jpg",
+                                                               :url => "http://localhost/post_picture.jpg",
+                                                               :type => "image/jpeg"
+                                                             })
+
+        Base64.should_receive(:encode64).and_return("encoded file content")
 
         @blog.publish(post).should be_true
         post.id.should == 123
@@ -108,6 +138,7 @@ describe Wordpress::Blog do
         @blog.update_post(post).should be_true
       end
     end
+
   end
 end
 
