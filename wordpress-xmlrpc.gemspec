@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{wordpress-xmlrpc}
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Naumenko"]
-  s.date = %q{2010-09-15}
+  s.date = %q{2010-09-20}
   s.description = %q{Please do not fork it before directly contacint}
   s.email = %q{alecnmk@gmail.com}
   s.extra_rdoc_files = [
@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
      "spec/post_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
+     "spec/support/files/post_picture.jpg",
      "wordpress-xmlrpc.gemspec"
   ]
   s.homepage = %q{http://github.com/alecnmk/wordpress-xmlrpc}
