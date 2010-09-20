@@ -19,6 +19,7 @@ module Wordpress
                   )
 
     def initialize(attributes = {})
+      self.images = []
       attributes.each do |attribute, value|
         accessor_name = "#{attribute}="
         send(accessor_name, value) if respond_to?(accessor_name)

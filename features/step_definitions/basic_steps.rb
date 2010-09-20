@@ -22,6 +22,7 @@ end
 When /^make following post:$/ do |table|
   table.hashes.each do |hash|
     hash['creation_date'] = Date.parse(hash.delete('creation_date')) if hash['creation_date']
+    hash.merge!({:images => [{:file_path => File.expand_path(hash.delete('image'))}]}) if hash['image']
     post = Wordpress::Post.new(hash)
     @blog.publish(post)
   end

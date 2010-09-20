@@ -1,6 +1,5 @@
 require 'xmlrpc/client'
 require 'params_check'
-require 'base64'
 require 'mimemagic'
 require 'nokogiri'
 
@@ -34,24 +33,13 @@ module Wordpress
     end #recent_posts
 
     def publish(post)
-      doc = Nokogiri::HTML::DocumentFragment.parse(post.content)
-      post.images.each do |image|
-        image_file = File.open(image[:file_path], "rb")
-        file_name = File.basename(image_file.path)
-
-        uploaded_image = upload_file(File.open(image[:file_path], "rb"))
-
-        doc.xpath("img[contains(@src, '#{file_name}')]").each do |img|
-          img['src'] = uploaded_image[:url]
-        end
-      end
-      post.content = doc.to_html
-
+      process_post_images(post)
       post.id = blog_api_call("metaWeblog.newPost", post.to_struct, true).to_i
       post.published = true
     end #publish
 
     def update_post(post)
+      process_post_images(post)
       return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
     end #update_post
 
@@ -59,13 +47,32 @@ module Wordpress
       struct = {
         :name => File.basename(file.path),
         :type => MimeMagic.by_magic(file).type,
-        :bits => Base64.encode64(file.read),
+        :bits => XMLRPC::Base64.new(File.open(file.path, "r").read),
         :overwrite => true
       }
       return blog_api_call("wp.uploadFile", struct)
     end
 
     private
+    def process_post_images(post)
+      doc = Nokogiri::HTML::DocumentFragment.parse(post.content)
+      post.images.each do |image|
+
+        raise ArgumentError, "Image not found (path: #{image[:file_path]})" unless File.exist?(image[:file_path])
+
+        image_file = File.open(image[:file_path], "rb")
+        file_name = File.basename(image_file.path)
+
+        uploaded_image = upload_file(File.open(image[:file_path], "rb"))
+        raise "Image upload failed" if uploaded_image.nil?
+
+        doc.xpath("img[contains(@src, '#{file_name}')]").each do |img|
+          img['src'] = uploaded_image['url']
+        end
+      end
+      post.content = doc.to_html
+    end #process_post_images
+
     def api_call(method_name, *args)
       begin
         return @client.call(method_name, *args)
