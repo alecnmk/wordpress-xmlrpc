@@ -38,11 +38,10 @@ module Wordpress
       post.published = true
     end #publish
 
-    # TODO: rename to "update"
-    def update_post(post)
+    def update(post)
       process_post_images(post)
       return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
-    end #update_post
+    end #update
 
     def delete(post)
       return api_call("blogger.deletePost", "", post.id, @user, @password, true)

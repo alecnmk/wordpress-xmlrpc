@@ -137,7 +137,7 @@ describe Wordpress::Blog do
       end
     end
 
-    describe "update_post" do
+    describe "update" do
       it "should submit post update" do
         images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
         post = Wordpress::Post.new(:id => 54, :title => "Updated post", :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",  :published => true, :images => images)
@@ -165,7 +165,7 @@ describe Wordpress::Blog do
                                                              })
         XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
 
-        @blog.update_post(post).should be_true
+        @blog.update(post).should be_true
       end
     end
 
