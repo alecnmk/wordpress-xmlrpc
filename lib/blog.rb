@@ -32,14 +32,21 @@ module Wordpress
       end
     end #recent_posts
 
-    def publish(post)
-      process_post_images(post)
-      post.id = blog_api_call("metaWeblog.newPost", post.to_struct, true).to_i
-      post.published = true
+    def publish(item)
+      process_images(item) unless item.images.nil?
+      case item
+      when Wordpress::Post
+        item.id = blog_api_call("metaWeblog.newPost", item.to_struct, true).to_i
+      when Wordpress::Page
+        item.id = blog_api_call("wp.newPage", item.to_struct, true).to_i
+      else
+        raise "Unknown item type: #{item}"
+      end
+      item.published = true
     end #publish
 
     def update(post)
-      process_post_images(post)
+      process_images(post)
       return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
     end #update
 
@@ -58,9 +65,9 @@ module Wordpress
     end
 
     private
-    def process_post_images(post)
-      doc = Nokogiri::HTML::DocumentFragment.parse(post.content)
-      post.images.each do |image|
+    def process_images(item)
+      doc = Nokogiri::HTML::DocumentFragment.parse(item.content)
+      item.images.each do |image|
 
         raise ArgumentError, "Image not found (path: #{image[:file_path]})" unless File.exist?(image[:file_path])
 
@@ -71,8 +78,8 @@ module Wordpress
           img['src'] = uploaded_image['url'] if img['src'].include?(basename)
         end
       end
-      post.content = doc.to_html
-    end #process_post_images
+      item.content = doc.to_html
+    end #process_images
 
     def api_call(method_name, *args)
       begin

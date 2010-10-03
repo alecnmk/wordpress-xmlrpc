@@ -7,7 +7,9 @@ require 'loggable'
 
 require 'exceptions'
 require 'blog'
+require 'content_item'
 require 'post'
+require 'page'
 
 
 

@@ -1,5 +1,5 @@
 module Wordpress
-  class Post
+  class Page
     include ContentItem
 
     ATTRIBUTE_MATCHES = {

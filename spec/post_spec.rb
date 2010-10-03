@@ -19,16 +19,19 @@ describe Wordpress::Post do
                                  :title => "Post title",
                                  :content => "Post content",
                                  :excerpt => "Post excerpt",
-                                 :creation_date => Date.parse("01.08.2010")
+                                 :creation_date => Date.parse("01.08.2010"),
+                                 :published => true
                                  )
       post.to_struct.should == {
         :postid => 99,
         :title => "Post title",
         :description => "Post content",
         :mt_excerpt => "Post excerpt",
-        :dateCreated => Date.parse("01.08.2010")
+        :dateCreated => Date.parse("01.08.2010"),
+        :post_state => "publish"
       }
     end
+
     it "should return incomplete struct for params without params that are nil" do
       post = Wordpress::Post.new(:title => "Post title")
       post.to_struct.should == {

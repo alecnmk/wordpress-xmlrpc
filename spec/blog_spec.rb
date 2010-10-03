@@ -57,7 +57,7 @@ describe Wordpress::Blog do
     end
 
     describe "delete_post" do
-      it "should make appropriate call to xmlrpc api" do
+      it "should make appropriate call to XMLRPC API" do
         @client_mock.should_receive(:call).with("blogger.deletePost", "", 123, "admin", "wordpress-xmlrpc", true).and_return(true)
 
         post = Wordpress::Post.new(:id => 123)
@@ -66,46 +66,94 @@ describe Wordpress::Blog do
     end
 
     describe "publish" do
-      it "should make appropriate call to xmlrpc api" do
-        images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
-        post = Wordpress::Post.new(
-                                   :title => "Hey ho",
-                                   :content => "Content <img src=\"http://otherhost/post_picture.jpg?1231231123\">",
-                                   :excerpt => "Excerpt",
-                                   :images => images,
-                                   :publish_date => Date.parse("01.08.2010"))
+      context "when Page passed as param" do
+        it "should make appropriate calls to XMLRPC API" do
+          images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
+
+          page = Wordpress::Page.new(
+                                     :title => "new Page",
+                                     :content => "Page content",
+                                     :excerpt => "Page excerpt",
+                                     :creation_date => Date.parse("01.08.2010"),
+                                     :images => images
+                                     )
+          @client_mock.should_receive(:call).with("wp.newPage",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  {
+                                                    :title => "new Page",
+                                                    :description => "Page content",
+                                                    :mt_excerpt => "Page excerpt",
+                                                    :dateCreated => Date.parse("01.08.2010")
+                                                  }, true).and_return(123)
+
+          file_struct = {
+            :name => "post_picture.jpg",
+            :type => "image/jpeg",
+            :bits => "encoded file content",
+            :overwrite => true
+          }
+          @client_mock.should_receive(:call).with(
+                                                  "wp.uploadFile",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  file_struct).and_return({
+                                                                  'file' => "post_picture.jpg",
+                                                                  'url' => "http://localhost/post_picture.jpg",
+                                                                  'type' => "image/jpeg"
+                                                                })
+
+          XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
 
 
-        required_post_struct = {
-          :title=>"Hey ho",
-          :description=>"Content <img src=\"http://localhost/post_picture.jpg\">",
-          :mt_excerpt=>"Excerpt"
-        }
+          @blog.publish(page).should be_true
+          page.id.should == 123
+        end
+      end
 
-        @client_mock.should_receive(:call).with(
-                                                "wp.uploadFile",
-                                                0, "admin", "wordpress-xmlrpc",
-                                                {
-                                                  :name => "post_picture.jpg",
-                                                  :type => "image/jpeg",
-                                                  :bits => "encoded file content",
-                                                  :overwrite => true
-                                                }).and_return({
-                                                               'file' => "post_picture.jpg",
-                                                               'url' => "http://localhost/post_picture.jpg",
-                                                               'type' => "image/jpeg"
-                                                             })
+      context "when Post passed as param" do
+        it "should make appropriate call to XMLRPC API" do
+          images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
+          post = Wordpress::Post.new(
+                                     :title => "Hey ho",
+                                     :content => "Content <img src=\"http://otherhost/post_picture.jpg?1231231123\">",
+                                     :excerpt => "Excerpt",
+                                     :images => images,
+                                     :creation_date => Date.parse("01.08.2010"))
 
-        @client_mock.should_receive(:call).with(
-                                                "metaWeblog.newPost",
-                                                0, "admin", "wordpress-xmlrpc",
-                                                required_post_struct, true).and_return("123")
 
-        XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
+          required_post_struct = {
+            :title => "Hey ho",
+            :description => "Content <img src=\"http://localhost/post_picture.jpg\">",
+            :mt_excerpt => "Excerpt",
+            :dateCreated => Date.parse("01.08.2010")
+          }
 
-        @blog.publish(post).should be_true
-        post.id.should == 123
-        post.published.should be_true
+
+          file_struct = {
+            :name => "post_picture.jpg",
+            :type => "image/jpeg",
+            :bits => "encoded file content",
+            :overwrite => true
+          }
+          @client_mock.should_receive(:call).with(
+                                                  "wp.uploadFile",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  file_struct).and_return({
+                                                                  'file' => "post_picture.jpg",
+                                                                  'url' => "http://localhost/post_picture.jpg",
+                                                                  'type' => "image/jpeg"
+                                                                })
+
+          @client_mock.should_receive(:call).with(
+                                                  "metaWeblog.newPost",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  required_post_struct, true).and_return("123")
+
+          XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
+
+          @blog.publish(post).should be_true
+          post.id.should == 123
+          post.published.should be_true
+        end
       end
     end
 
@@ -117,7 +165,10 @@ describe Wordpress::Blog do
           }
         end
 
-        @client_mock.should_receive(:call).with("metaWeblog.getRecentPosts", 0, "admin", "wordpress-xmlrpc", 10).and_return(post_structs)
+        @client_mock.should_receive(:call).with(
+                                                "metaWeblog.getRecentPosts",
+                                                0, "admin", "wordpress-xmlrpc",
+                                                10).and_return(post_structs)
 
         recent_posts = @blog.recent_posts(10)
         recent_posts.size.should == 10
@@ -145,7 +196,8 @@ describe Wordpress::Blog do
         required_post_struct = {
           :title=>"Updated post",
           :description=>"Content <img src=\"http://localhost/post_picture.jpg\">",
-          :postid => 54
+          :postid => 54,
+          :post_state => "publish"
         }
         @client_mock.should_receive(:call).with("metaWeblog.editPost",
                                                 54, "admin", "wordpress-xmlrpc",
