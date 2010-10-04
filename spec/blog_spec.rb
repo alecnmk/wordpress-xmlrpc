@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Wordpress::Blog do
+
   describe "initialize" do
     before(:each) do
       @valid_params = {
@@ -81,16 +82,16 @@ describe Wordpress::Blog do
       it "should return list of pages" do
         page_structs = [
                         {
-                          :page_id => 1,
-                          :page_title => "Page one",
-                          :page_parent_id => 2,
-                          :dateCreated => Date.parse("01.08.2010")
+                          "page_id" => 1,
+                          "page_title" => "Page one",
+                          "page_parent_id" => 2,
+                          "dateCreated" => Date.parse("01.08.2010")
                         },
                         {
-                          :page_id => 2,
-                          :page_title => "Page two",
-                          :page_parent_id => nil,
-                          :dateCreated => Date.parse("01.08.2010")
+                          "page_id" => 2,
+                          "page_title" => "Page two",
+                          "page_parent_id" => nil,
+                          "dateCreated" => Date.parse("01.08.2010")
                         }
                        ]
         @client_mock.should_receive(:call).with("wp.getPageList", 0, "admin", "wordpress-xmlrpc").and_return(page_structs)
@@ -142,6 +143,7 @@ describe Wordpress::Blog do
                                                   0, "admin", "wordpress-xmlrpc",
                                                   {
                                                     :title => "new Page",
+                                                    :page_title => "new Page",
                                                     :description => "Page content",
                                                     :mt_excerpt => "Page excerpt",
                                                     :dateCreated => Date.parse("01.08.2010")
@@ -222,7 +224,7 @@ describe Wordpress::Blog do
       it "should make appropriate call to xmlrpc api and return list of posts" do
         post_structs = (1..10).collect do |index|
           {
-            :title => "Post #{index}"
+            "title" => "Post #{index}"
           }
         end
 
@@ -250,38 +252,82 @@ describe Wordpress::Blog do
     end
 
     describe "update" do
-      it "should submit post update" do
-        images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
-        post = Wordpress::Post.new(:id => 54, :title => "Updated post", :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",  :published => true, :images => images)
+      before(:each) do
+        @images = [{:file_path => File.expand_path("./spec/support/files/post_picture.jpg")}]
 
-        required_post_struct = {
-          :title=>"Updated post",
-          :description=>"Content <img src=\"http://localhost/post_picture.jpg\">",
-          :postid => 54,
-          :post_state => "publish"
-        }
-        @client_mock.should_receive(:call).with("metaWeblog.editPost",
-                                                54, "admin", "wordpress-xmlrpc",
-                                                required_post_struct, true).and_return(true)
-
-        @client_mock.should_receive(:call).with("wp.uploadFile",
-                                                0, "admin", "wordpress-xmlrpc",
-                                                {
-                                                  :name => "post_picture.jpg",
-                                                  :type => "image/jpeg",
-                                                  :bits => "encoded file content",
-                                                  :overwrite => true
-                                                }).and_return({
-                                                               'file' => "post_picture.jpg",
-                                                               'url' => "http://localhost/post_picture.jpg",
-                                                               'type' => "image/jpeg"
-                                                             })
-        XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
-
-        @blog.update(post).should be_true
       end
-    end
 
+      context "when page passed as param" do
+        it "should submit page update" do
+          page = Wordpress::Page.new(
+                                     :id => 123,
+                                     :title => "Updated page",
+                                     :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",
+                                     :published => true,
+                                     :images => @images
+                                     )
+          required_page_struct = {
+            :title => "Updated page",
+            :page_title => "Updated page",
+            :description => "Content <img src=\"http://localhost/post_picture.jpg\">",
+            :page_id => 123
+          }
+          @client_mock.should_receive(:call).with("wp.editPage", 0, 123, "admin", "wordpress-xmlrpc", required_page_struct, true).and_return true
+          @client_mock.should_receive(:call).with("wp.uploadFile",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  {
+                                                    :name => "post_picture.jpg",
+                                                    :type => "image/jpeg",
+                                                    :bits => "encoded file content",
+                                                    :overwrite => true
+                                                  }).and_return({
+                                                                  'file' => "post_picture.jpg",
+                                                                  'url' => "http://localhost/post_picture.jpg",
+                                                                  'type' => "image/jpeg"
+                                                                })
+          XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
+
+          @blog.update(page).should be_true
+        end
+      end
+
+      context "when post passed as param" do
+        it "should submit post update" do
+          post = Wordpress::Post.new(
+                                     :id => 54,
+                                     :title => "Updated post",
+                                     :content => "Content <img src=\"http://otherhost/post_picture.jpg\">",
+                                     :published => true,
+                                     :images => @images)
+
+          required_post_struct = {
+            :title => "Updated post",
+            :description => "Content <img src=\"http://localhost/post_picture.jpg\">",
+            :postid => 54,
+            :post_state => "publish"
+          }
+          @client_mock.should_receive(:call).with("metaWeblog.editPost",
+                                                  54, "admin", "wordpress-xmlrpc",
+                                                  required_post_struct, true).and_return(true)
+
+          @client_mock.should_receive(:call).with("wp.uploadFile",
+                                                  0, "admin", "wordpress-xmlrpc",
+                                                  {
+                                                    :name => "post_picture.jpg",
+                                                    :type => "image/jpeg",
+                                                    :bits => "encoded file content",
+                                                    :overwrite => true
+                                                  }).and_return({
+                                                                  'file' => "post_picture.jpg",
+                                                                  'url' => "http://localhost/post_picture.jpg",
+                                                                  'type' => "image/jpeg"
+                                                                })
+          XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
+
+          @blog.update(post).should be_true
+        end
+      end
+      end
   end
 end
 

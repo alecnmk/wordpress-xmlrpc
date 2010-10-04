@@ -3,10 +3,13 @@ module Wordpress
     module ClassMethods
       def from_struct(api, struct)
         content_item = self.new
+
         self::ATTRIBUTE_MATCHES[api].each do |struct_attribute, item_attribute|
-          value = struct[struct_attribute]
+          value = struct[struct_attribute.to_s]
+          value = value.to_date if value.kind_of?XMLRPC::DateTime
           content_item.send("#{item_attribute}=", value) unless value.nil?
         end
+
         content_item
       end #self.from_struct
     end

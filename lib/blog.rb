@@ -45,9 +45,16 @@ module Wordpress
       end
     end #publish
 
-    def update(post)
-      process_images(post)
-      return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct(:metaWeblog), post.published)
+    def update(item)
+      process_images(item) unless item.images.nil?
+      case item
+      when Post
+        return api_call("metaWeblog.editPost", item.id, @user, @password, item.to_struct(:metaWeblog), item.published)
+      when Page
+        return api_call("wp.editPage", @id, item.id, @user, @password, item.to_struct(:wp), item.published)
+      else
+        raise "Unknown item type: #{item}"
+      end
     end #update
 
     def delete(item)
@@ -63,14 +70,14 @@ module Wordpress
 
     def get_page_list
       page_list = blog_api_call("wp.getPageList").collect do |struct|
-        page = Wordpress::Page.from_struct(:wp, struct)
-        page.title = struct[:page_title]
-        page
+        Wordpress::Page.from_struct(:wp, struct)
       end
       # link pages list with each other
       page_list.each do |page|
         page.parent = page_list.find{|p| p.id == page.parent_id} if page.parent_id
       end
+
+      page_list
     end #get_page_list
 
     def upload_file(file)

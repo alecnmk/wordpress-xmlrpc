@@ -42,9 +42,9 @@ shared_examples_for "Blog item" do
     it "should create item from RPC struct" do
       item = subject.from_struct(@api_standard,
                                  {
-                                   :description => "item content",
-                                   :mt_excerpt => "item excerpt",
-                                   :dateCreated => "01.08.2010"
+                                   "description" => "item content",
+                                   "mt_excerpt" => "item excerpt",
+                                   "dateCreated" => "01.08.2010"
                                  })
       item.content.should == "item content"
       item.excerpt.should == "item excerpt"
