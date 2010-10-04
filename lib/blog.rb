@@ -28,7 +28,7 @@ module Wordpress
 
     def recent_posts(number_of_posts)
       blog_api_call("metaWeblog.getRecentPosts", number_of_posts).collect do |struct|
-        Post.from_struct(struct)
+        Post.from_struct(:metaWeblog, struct)
       end
     end #recent_posts
 
@@ -36,23 +36,42 @@ module Wordpress
       process_images(item) unless item.images.nil?
       case item
       when Wordpress::Post
-        item.id = blog_api_call("metaWeblog.newPost", item.to_struct, true).to_i
+        item.id = blog_api_call("metaWeblog.newPost", item.to_struct(:metaWeblog), true).to_i
+        item.published = true
       when Wordpress::Page
-        item.id = blog_api_call("wp.newPage", item.to_struct, true).to_i
+        item.id = blog_api_call("wp.newPage", item.to_struct(:wp), true).to_i
       else
         raise "Unknown item type: #{item}"
       end
-      item.published = true
     end #publish
 
     def update(post)
       process_images(post)
-      return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct, post.published)
+      return api_call("metaWeblog.editPost", post.id, @user, @password, post.to_struct(:metaWeblog), post.published)
     end #update
 
-    def delete(post)
-      return api_call("blogger.deletePost", "", post.id, @user, @password, true)
+    def delete(item)
+      case item
+      when Wordpress::Post
+        return api_call("blogger.deletePost", "", item.id, @user, @password, true)
+      when Wordpress::Page
+        return blog_api_call("wp.deletePage", item.id)
+      else
+        raise "Unknown item type: #{item}"
+      end
     end
+
+    def get_page_list
+      page_list = blog_api_call("wp.getPageList").collect do |struct|
+        page = Wordpress::Page.from_struct(:wp, struct)
+        page.title = struct[:page_title]
+        page
+      end
+      # link pages list with each other
+      page_list.each do |page|
+        page.parent = page_list.find{|p| p.id == page.parent_id} if page.parent_id
+      end
+    end #get_page_list
 
     def upload_file(file)
       struct = {

@@ -56,12 +56,73 @@ describe Wordpress::Blog do
                                    )
     end
 
-    describe "delete_post" do
-      it "should make appropriate call to XMLRPC API" do
-        @client_mock.should_receive(:call).with("blogger.deletePost", "", 123, "admin", "wordpress-xmlrpc", true).and_return(true)
+    describe "delete" do
+      context "when post passed as param" do
+        it "should make appropriate call to XMLRPC API" do
+          @client_mock.should_receive(:call).with("blogger.deletePost", "", 123, "admin", "wordpress-xmlrpc", true).and_return(true)
 
-        post = Wordpress::Post.new(:id => 123)
-        @blog.delete(post).should be_true
+          post = Wordpress::Post.new(:id => 123)
+          @blog.delete(post).should be_true
+        end
+      end
+
+      context "when page passed as param" do
+        it "should make appropriate call to XMLRPC API" do
+          @client_mock.should_receive(:call).with("wp.deletePage", 0, "admin", "wordpress-xmlrpc", 123).and_return(true)
+
+          page = Wordpress::Page.new(:id => 123)
+          @blog.delete(page).should be_true
+        end
+      end
+
+    end
+
+    describe "get_page_list" do
+      it "should return list of pages" do
+        page_structs = [
+                        {
+                          :page_id => 1,
+                          :page_title => "Page one",
+                          :page_parent_id => 2,
+                          :dateCreated => Date.parse("01.08.2010")
+                        },
+                        {
+                          :page_id => 2,
+                          :page_title => "Page two",
+                          :page_parent_id => nil,
+                          :dateCreated => Date.parse("01.08.2010")
+                        }
+                       ]
+        @client_mock.should_receive(:call).with("wp.getPageList", 0, "admin", "wordpress-xmlrpc").and_return(page_structs)
+
+        page_two = Wordpress::Page.new(
+                                       :id => 2,
+                                       :title => "Page two",
+                                       :creation_date => Date.parse("01.08.2010"),
+                                       :parent => nil
+                                       )
+        page_one = Wordpress::Page.new(
+                                       :id => 1,
+                                       :title => "Page one",
+                                       :creation_date => Date.parse("01.08.2010"),
+                                       :parent_id => 2
+                                       )
+        page_list = [page_one, page_two]
+
+        result_page_list = @blog.get_page_list
+        result_page_list.size.should == 2
+
+        result_page_list[0].id.should == 1
+        result_page_list[0].title.should == "Page one"
+        result_page_list[0].parent_id == 2
+        result_page_list[0].parent.should == result_page_list[1]
+        result_page_list[0].creation_date.should == Date.parse("01.08.2010")
+
+        result_page_list[1].id.should == 2
+        result_page_list[1].title.should == "Page two"
+        result_page_list[1].parent_id.should be_nil
+        result_page_list[1].creation_date.should == Date.parse("01.08.2010")
+
       end
     end
 

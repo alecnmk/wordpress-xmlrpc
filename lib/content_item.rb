@@ -1,10 +1,11 @@
 module Wordpress
   module ContentItem
     module ClassMethods
-      def from_struct(struct)
+      def from_struct(api, struct)
         content_item = self.new
-        self::ATTRIBUTE_MATCHES.each do |item_attribute, struct_attribute|
-          content_item.send("#{item_attribute}=", struct[struct_attribute])
+        self::ATTRIBUTE_MATCHES[api].each do |struct_attribute, item_attribute|
+          value = struct[struct_attribute]
+          content_item.send("#{item_attribute}=", value) unless value.nil?
         end
         content_item
       end #self.from_struct
@@ -17,24 +18,14 @@ module Wordpress
         apply_attributes(attributes)
       end #initialize
 
-      def to_struct
+      def to_struct(api)
         struct = {}
-        self.class::ATTRIBUTE_MATCHES.each do |item_attribute, struct_attribute|
+        self.class::ATTRIBUTE_MATCHES[api].each do |struct_attribute, item_attribute|
           value = self.send(item_attribute)
           struct[struct_attribute] = value if value
         end
         struct
       end #to_struct
-
-      def struct_published=(value)
-        @published = value if [true, false].include? value
-        @published = value == "publish" if value.kind_of? String
-      end
-
-      def struct_published()
-        return "publish" if @published == true
-        return nil
-      end #struct_published
 
       def creation_date=(value)
         case value
@@ -68,8 +59,7 @@ module Wordpress
                       :title,
                       :content,
                       :excerpt,
-                      :images,
-                      :published
+                      :images
                       )
         attr_reader(:creation_date)
       end
