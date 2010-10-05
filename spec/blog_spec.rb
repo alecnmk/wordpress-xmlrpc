@@ -94,7 +94,7 @@ describe Wordpress::Blog do
                           "dateCreated" => Date.parse("01.08.2010")
                         }
                        ]
-        @client_mock.should_receive(:call).with("wp.getPageList", 0, "admin", "wordpress-xmlrpc").and_return(page_structs)
+        @client_mock.should_receive(:call).with("wp.getPages", 0, "admin", "wordpress-xmlrpc").and_return(page_structs)
 
         page_two = Wordpress::Page.new(
                                        :id => 2,
@@ -167,7 +167,8 @@ describe Wordpress::Blog do
           XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
 
 
-          @blog.publish(page).should be_true
+          @blog.publish(page).should == page
+          page.published.should be_true
           page.id.should == 123
         end
       end
@@ -213,7 +214,7 @@ describe Wordpress::Blog do
 
           XMLRPC::Base64.should_receive(:new).and_return("encoded file content")
 
-          @blog.publish(post).should be_true
+          @blog.publish(post).should == post
           post.id.should == 123
           post.published.should be_true
         end

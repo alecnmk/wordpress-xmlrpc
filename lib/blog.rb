@@ -37,12 +37,13 @@ module Wordpress
       case item
       when Wordpress::Post
         item.id = blog_api_call("metaWeblog.newPost", item.to_struct(:metaWeblog), true).to_i
-        item.published = true
       when Wordpress::Page
         item.id = blog_api_call("wp.newPage", item.to_struct(:wp), true).to_i
       else
         raise "Unknown item type: #{item}"
       end
+      item.published = true
+      return item
     end #publish
 
     def update(item)
@@ -69,7 +70,7 @@ module Wordpress
     end
 
     def get_page_list
-      page_list = blog_api_call("wp.getPageList").collect do |struct|
+      page_list = blog_api_call("wp.getPages").collect do |struct|
         Wordpress::Page.from_struct(:wp, struct)
       end
       # link pages list with each other
