@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{wordpress-xmlrpc}
-  s.version = "0.0.9"
+  s.version = "0.0.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Naumenko"]
-  s.date = %q{2010-09-20}
+  s.date = %q{2010-10-05}
   s.description = %q{Please do not fork it before directly contacint}
   s.email = %q{alecnmk@gmail.com}
   s.extra_rdoc_files = [
@@ -29,16 +29,20 @@ Gem::Specification.new do |s|
      "features/step_definitions/mysql_steps.rb",
      "features/support/env.rb",
      "lib/blog.rb",
+     "lib/content_item.rb",
      "lib/exceptions.rb",
      "lib/loggable.rb",
+     "lib/page.rb",
      "lib/params_check.rb",
      "lib/post.rb",
      "lib/wordpress-xmlrpc.rb",
      "spec/blog_spec.rb",
+     "spec/page_spec.rb",
      "spec/post_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/support/files/post_picture.jpg",
+     "spec/support/models/blog_item_shared.rb",
      "wordpress-xmlrpc.gemspec"
   ]
   s.homepage = %q{http://github.com/alecnmk/wordpress-xmlrpc}
@@ -47,8 +51,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{This gem is supposed to simplify wordpress xmlrpc interaction}
   s.test_files = [
-    "spec/spec_helper.rb",
+    "spec/page_spec.rb",
+     "spec/spec_helper.rb",
      "spec/blog_spec.rb",
+     "spec/support/models/blog_item_shared.rb",
      "spec/post_spec.rb"
   ]
 
